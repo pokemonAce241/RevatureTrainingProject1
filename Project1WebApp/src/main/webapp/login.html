@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>login</title>
+</head>
+<body>
+
+<style>
+
+body, html{
+ background-image: url("Reimbursment_Homepage.png");
+  background-repeat: no-repeat;
+  background-size: cover;
+ }
+ 
+ h1{
+ 	border: 4px double;
+ 		
+ }
+ 
+ input{
+ 	align:center;
+ }
+ 
+ div{
+ text-align: center;
+ }
+ 
+ div.wrapper{
+ 	width: 300px:
+ 	height:300px;
+ 	border: 2px solid back;
+ 	text-align: center;
+ }
+ 
+ input[type="text"]{
+ 	display: block;
+ 	margin: 0 auto;
+ 
+ }
+ 
+ input[type="password"]{
+ 	display: block;
+ 	margin: 0 auto;
+ 
+ }
+ 
+ 
+
+
+ 
+
+
+</style>
+
+<h1 style="text-align:center" align="center" >JJT Reimbursement Co.</h1>
+
+<h3 align="center">User Login</h3>
+	
+	<div class="wrapper">
+    <input type="text" placeholder="username" id="username">
+    <input type="password" placeholder="password" id="password">
+    <button onclick="login()">Login</button>
+    	
+    </div>
+    
+   
+    <p id = "failLogin">
+    
+    </p>
+    
+    
+    
+
+</body>
+
+
+<script>
+function login(){
+	
+	    let username = document.getElementById("username").value;
+	    console.log(username);
+	    let password = document.getElementById("password").value;
+	    console.log(password);
+	    
+	    
+	    let xhttp = new XMLHttpRequest();
+	            console.log("check");
+	            xhttp.onreadystatechange = function(){
+	              
+	                if(this.readyState == 4 && this.status == 200){              
+	                    console.log(this.responseText);
+	                    let user =  JSON.parse(this.responseText);
+	                    let error = document.getElementById("failLogin");
+	                    if(user.employee_position === ("employee")){
+	                    	location.href = "http://localhost:8080/Project1WebApp/employee.html";
+	                    }
+	                    else{
+	                    	if(user.employee_position === ("manager")){
+	                    		location.href = "http://localhost:8080/Project1WebApp/manager.html";
+	                    	}
+	                    	else{
+	                    		error.innerHTML = "Invalid username/password please try again."
+	                    	}
+	                    	
+	                    }
+	                    
+	                    
+
+	                    }};
+	            
+	    
+	            
+	            xhttp.open("POST","http://localhost:8080/Project1WebApp/loginUser.do",true);
+	            xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+	            xhttp.send(`username=${username}&password=${password}`);
+	
+	}
+	
+	
+
+
+
+
+</script>
+</html>

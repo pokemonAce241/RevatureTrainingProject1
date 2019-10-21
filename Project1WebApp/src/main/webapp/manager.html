@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>manager</title>
+</head>
+<body onload ="getReimbursements()">
+
+<style>
+ table,th,td {
+ 
+ border: 1px solid black;
+ border-collapse: collapse;
+ 
+ }
+ 
+ body, html{
+ background-image: url("Reimbursment_Homepage.png");
+  background-repeat: no-repeat;
+  background-size: cover;
+ }
+ 
+  h1{
+ 	border: 4px double;
+ 		
+ }
+ 
+ div.hidden{
+ 	display: none;
+ }
+ 
+ th.hidden{
+ 	display: none;
+ }
+ 
+ td.hidden{
+ 	display: none;
+ }
+ 
+ .parent{
+ 	text-align:center;
+ }
+
+.pendingButton{
+	position:fixed;
+  	bottom:0;
+}
+
+
+
+div.wrapper{
+ 	width: 300px:
+ 	height:300px;
+ 	border: 2px solid back;
+ }
+ 
+ input[type="text"]{
+ 	display: block;
+ 	margin: 0 auto;
+ 
+ }
+ 
+ button.center{
+    height:20px; 
+    width:200px; 
+    margin: -20px -50px; 
+    position:relative;
+    top:50%; 
+    left:46%;
+}
+
+button.acc{
+height:20px; 
+    width:100px; 
+    margin: -20px -50px; 
+    position:relative;
+    top:50%; 
+    left:46%;
+}
+
+button.den{
+height:20px; 
+    width:100px; 
+    margin: -20px -50px; 
+    position:relative;
+    top:50%; 
+    Left:100%;
+}
+
+
+div.fixed{
+position: fixed;
+bottom:7%;
+right: 45%;
+}
+
+
+
+
+</style>
+
+
+
+<button onClick="logout()">Logout</button>
+<h1 style="text-align:center" align="center" >JJT Reimbursement Co.</h1>
+
+<h2 align="center"><u>Current List of Reimbursements</u></h3>
+<table id = "reimbursements" width="900" align="center" bgcolor="white">
+<tr>
+<th onclick="sortTable(0)">sender</th>
+<th onclick="sortTable(1)">item</th>
+<th onclick="sortTable(2)">cost</th>
+<th onclick="sortTable(3)">reason</th>
+<th onclick="sortTable(4)">submitterID</th>
+<th onclick="sortTable(5)">status</th>
+<th onclick="sortTable(6)">managerComment</th>
+
+</tr>
+
+
+</table>
+
+
+<h2 align="center"><u>Current Pending Reimbursement</u></h3>
+
+<table id = "pendingReimbursement" width="900" align="center" bgcolor="white">
+<tr>
+<th>sender</th>
+<th>item</th>
+<th>cost</th>
+<th>reason</th>
+<th>submitterID</th>
+<th>status</th>
+<th>managerComment</th>
+
+</tr>
+
+<tr>
+<td id = "sender"></td>
+<td id = "item"></td>
+<td id = "cost"></td>
+<td id = "reason"></td>
+<td id = "submitterID"></td>
+<td id = "status"></td>
+<td id = "managerComment"></td>
+
+
+</tr>
+
+
+</table>
+
+<button onclick = "getPendingreimbursement()" class="center">Get Pending Reimbursement</button>
+
+<div id="rForm"  class="hidden">
+	<div class="fixed">
+		<h3 align="center"><u>Approve or Deny Reimbursement. Leave a comment if you wish</u></h3>
+		<input type="text" placeholder="Enter Comment here..." id="mc" style="width: 400px;" >
+		<button onClick="updateAppliedReimbursement()" class="acc">Approved</button>
+		<button onClick="updateDeniedReimbursement()" class="den">Denied</button>
+	</div>
+	
+</div>
+
+
+
+
+
+
+
+</body>
+
+<script>
+
+function logout(){
+	
+	location.href = "http://localhost:8080/Project1WebApp/login.html";
+}
+
+
+function getReimbursements(){
+	 let xhttp = new XMLHttpRequest();
+
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            console.log(this.responseText);
+            let reimbursements =  JSON.parse(this.responseText);
+            let table = document.getElementById("reimbursements");
+          
+            for(let i = 0; i <reimbursements.length; i++){			
+				 
+                let reimbursement = `<td>${reimbursements[i].sender}</td><td>${reimbursements[i].item}</td><td>${reimbursements[i].cost}</td><td>${reimbursements[i].reason}</td><td>${reimbursements[i].submitterID}</td><td>${reimbursements[i].status}</td><td>${reimbursements[i].managerComment}</td>`;
+                
+                let nrow = table.insertRow();
+                
+                nrow.innerHTML = reimbursement;
+
+            }
+
+            //document.getElementById("reimbursements").innerHTML = list;
+            
+       }
+    };
+    xhttp.open("GET", "http://localhost:8080/Project1WebApp/getAllReimbursements.do", true);
+    xhttp.send(); 
+	
+}
+
+
+function getPendingreimbursement() {
+	
+	let xhttp = new XMLHttpRequest();
+
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+        	//console.log(this.responseText);
+        	let reimbursement =  JSON.parse(this.responseText);
+        	
+        	
+        	
+        	
+        	document.getElementById("sender").innerHTML = `${reimbursement.sender}`;
+        	document.getElementById("item").innerHTML = `${reimbursement.item}`;
+        	document.getElementById("cost").innerHTML = `${reimbursement.cost}`;
+        	document.getElementById("reason").innerHTML = `${reimbursement.reason}`;
+        	document.getElementById("submitterID").innerHTML = `${reimbursement.submitterID}`;
+        	document.getElementById("status").innerHTML = `${reimbursement.status}`;
+        	document.getElementById("managerComment").innerHTML = `${reimbursement.managerComment}`;
+           
+        	
+        	toggleViewON();
+       }
+    };
+    xhttp.open("GET", "http://localhost:8080/Project1WebApp/getPendingReimbursement.do", true);
+    xhttp.send(); 
+	
+	
+	
+	
+	
+}
+
+function updateAppliedReimbursement(){
+	
+	let xhttp = new XMLHttpRequest();
+	
+	
+	
+	let status = "approved";
+	let managerComment = document.getElementById("mc").value;
+	
+	//console.log(id);
+
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+        	
+        	document.getElementById("sender").innerHTML = "";
+        	document.getElementById("item").innerHTML = "";
+        	document.getElementById("cost").innerHTML = "";
+        	document.getElementById("reason").innerHTML = "";
+        	document.getElementById("submitterID").innerHTML = "";
+        	document.getElementById("status").innerHTML = "";
+        	document.getElementById("managerComment").innerHTML = "";
+        	toggleViewOFF();
+        	location.reload();
+            
+       }
+    };
+    xhttp.open("POST", "http://localhost:8080/Project1WebApp/updateReimbursement.do", true);
+    xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    xhttp.send(`status=${status}&managerComment=${managerComment}`);
+}
+
+function updateDeniedReimbursement(){
+	
+	let xhttp = new XMLHttpRequest();
+	
+	
+	
+	let status = "denied";
+	let managerComment = document.getElementById("mc").value;
+	
+	//console.log(id);
+
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+        	
+        	document.getElementById("sender").innerHTML = "";
+        	document.getElementById("item").innerHTML = "";
+        	document.getElementById("cost").innerHTML = "";
+        	document.getElementById("reason").innerHTML = "";
+        	document.getElementById("submitterID").innerHTML = "";
+        	document.getElementById("status").innerHTML = "";
+        	document.getElementById("managerComment").innerHTML = "";
+        	toggleViewOFF();
+        	location.reload();
+            
+       }
+    };
+    xhttp.open("POST", "http://localhost:8080/Project1WebApp/updateReimbursement.do", true);
+    xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    xhttp.send(`status=${status}&managerComment=${managerComment}`);
+}
+
+
+
+
+function toggleViewON(){
+	let toggle = document.getElementById("rForm");
+	toggle.style.display = "block";
+	
+}
+
+function toggleViewOFF(){
+	let toggle = document.getElementById("rForm");
+	toggle.style.display = "none";
+	
+}
+
+
+function sortTable(n){
+	
+	var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+	  table = document.getElementById("reimbursements");
+	  switching = true;
+	  //Set the sorting direction to ascending:
+	  dir = "asc"; 
+	  /*Make a loop that will continue until
+	  no switching has been done:*/
+	  while (switching) {
+	    //start by saying: no switching is done:
+	    switching = false;
+	    rows = table.rows;
+	    /*Loop through all table rows (except the
+	    first, which contains table headers):*/
+	    for (i = 1; i < (rows.length - 1); i++) {
+	      //start by saying there should be no switching:
+	      shouldSwitch = false;
+	      /*Get the two elements you want to compare,
+	      one from current row and one from the next:*/
+	      x = rows[i].getElementsByTagName("TD")[n];
+	      y = rows[i + 1].getElementsByTagName("TD")[n];
+	      /*check if the two rows should switch place,
+	      based on the direction, asc or desc:*/
+	      if (dir == "asc") {
+	        if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+	          //if so, mark as a switch and break the loop:
+	          shouldSwitch= true;
+	          break;
+	        }
+	      } else if (dir == "desc") {
+	        if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+	          //if so, mark as a switch and break the loop:
+	          shouldSwitch = true;
+	          break;
+	        }
+	      }
+	    }
+	    if (shouldSwitch) {
+	      /*If a switch has been marked, make the switch
+	      and mark that a switch has been done:*/
+	      rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+	      switching = true;
+	      //Each time a switch is done, increase this count by 1:
+	      switchcount ++;      
+	    } else {
+	      /*If no switching has been done AND the direction is "asc",
+	      set the direction to "desc" and run the while loop again.*/
+	      if (switchcount == 0 && dir == "asc") {
+	        dir = "desc";
+	        switching = true;
+	      }
+	    }
+	  }
+	
+	
+	
+	
+	
+	
+	
+	
+}
+
+
+</script>
+</html>

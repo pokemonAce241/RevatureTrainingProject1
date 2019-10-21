@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>employee</title>
+</head>
+<body onload ="getReimbursements()">
+
+
+<style>
+ table,th,td {
+ 
+ border: 1px solid black;
+ border-collapse: collapse;
+ 
+ }
+ 
+ body, html{
+ background-image: url("Reimbursment_Homepage.png");
+  background-repeat: no-repeat;
+  background-size: cover;
+ }
+ 
+  h1{
+ 	border: 4px double;
+ 		
+ }
+ 
+ div.wrapper{
+ 	width: 300px:
+ 	height:300px;
+ 	border: 2px solid back;
+ }
+ 
+ input[type="text"]{
+ 	display: block;
+ 	margin: 0 auto;
+ 
+ }
+ 
+ button.center{
+    height:20px; 
+    width:200px; 
+    margin: -20px -50px; 
+    position:relative;
+    top:50%; 
+    left:46%;
+}
+ 
+
+
+
+</style>
+
+
+<!--  <button onload ="getReimbursements()">View current Reimbursements</button>-->
+
+<!-- <button onClick ="clearTable()">Clear Reimbursements</button> -->
+
+<button onClick="logout()">Logout</button>
+<h1 style="text-align:center" align="center" >JJT Reimbursement Co.</h1>
+<h2 align="center"><u>Current List of Reimbursements</u></h3>
+<table id = "reimbursements"  width="900" align="center" bgcolor="white">
+<tr>
+<th>sender</th>
+<th>item</th>
+<th>cost</th>
+<th>reason</th>
+<th>submitterID</th>
+<th>status</th>
+<th>managerComment</th>
+
+</tr>
+
+
+</table>
+
+
+<h2 align="center"><u>Add a new Reimbursement</u></h3>
+
+
+
+<h5 align="center">sender name</h5>
+<input type="text" placeholder="sender" id="sender">
+<h5 align="center">item being reimbursed</h5>
+<input type="text" placeholder="item" id="item">
+<h5 align="center">cost of item</h5>
+<input type="text" placeholder="cost" id="cost">
+<h5 align="center">reason for return</h5>
+<input type="text" placeholder="reason" id="reason">
+
+
+<button onclick="addReimbursement()" class="center">Submit Reimbursement</button>
+
+</body>
+
+
+
+<script>
+
+	function logout(){
+		
+		location.href = "http://localhost:8080/Project1WebApp/login.html";
+	}
+	
+	
+	
+	function getReimbursements(){
+		 let xhttp = new XMLHttpRequest();
+
+         xhttp.onreadystatechange = function() {
+             if (this.readyState == 4 && this.status == 200) {
+                 console.log(this.responseText);
+                 let reimbursements =  JSON.parse(this.responseText);
+                 let table = document.getElementById("reimbursements");
+               
+                 for(let i = 0; i <reimbursements.length; i++){			
+					 
+                     let reimbursement = `<td>${reimbursements[i].sender}</td><td>${reimbursements[i].item}</td><td>${reimbursements[i].cost}</td><td>${reimbursements[i].reason}</td><td>${reimbursements[i].submitterID}</td><td>${reimbursements[i].status}</td><td>${reimbursements[i].managerComment}</td>`;
+                     
+                     let nrow = table.insertRow();
+                     
+                     nrow.innerHTML = reimbursement;
+
+                 }
+
+                 //document.getElementById("reimbursements").innerHTML = list;
+                 
+            }
+         };
+         xhttp.open("GET", "http://localhost:8080/Project1WebApp/getAllReimbursements.do", true);
+         xhttp.send(); 
+		
+	}
+	
+	function addReimbursement(){
+		
+		let xhttp = new XMLHttpRequest();
+		
+		let sender = document.getElementById("sender").value;
+		let item = document.getElementById("item").value;
+		let cost = document.getElementById("cost").value;
+		let reason = document.getElementById("reason").value;
+
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+            	console.log(this.responseText);
+                location.reload();
+                
+           }
+        };
+        xhttp.open("POST", "http://localhost:8080/Project1WebApp/addReimbursement.do", true);
+        xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhttp.send(`sender=${sender}&item=${item}&cost=${cost}&reason=${reason}`);
+		
+	}
+	
+	function clearTable(){
+		let table = document.getElementById("reimbursements");
+		let rowCount = table.rows.length;
+		for(let l = 0; l < rowCount; l++){
+			table.deleteRow(l);
+		}
+		
+		
+	}
+	
+	
+	function sortTable(n){
+		
+		var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+		  table = document.getElementById("reimbursements");
+		  switching = true;
+		  //Set the sorting direction to ascending:
+		  dir = "asc"; 
+		  /*Make a loop that will continue until
+		  no switching has been done:*/
+		  while (switching) {
+		    //start by saying: no switching is done:
+		    switching = false;
+		    rows = table.rows;
+		    /*Loop through all table rows (except the
+		    first, which contains table headers):*/
+		    for (i = 1; i < (rows.length - 1); i++) {
+		      //start by saying there should be no switching:
+		      shouldSwitch = false;
+		      /*Get the two elements you want to compare,
+		      one from current row and one from the next:*/
+		      x = rows[i].getElementsByTagName("TD")[n];
+		      y = rows[i + 1].getElementsByTagName("TD")[n];
+		      /*check if the two rows should switch place,
+		      based on the direction, asc or desc:*/
+		      if (dir == "asc") {
+		        if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+		          //if so, mark as a switch and break the loop:
+		          shouldSwitch= true;
+		          break;
+		        }
+		      } else if (dir == "desc") {
+		        if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+		          //if so, mark as a switch and break the loop:
+		          shouldSwitch = true;
+		          break;
+		        }
+		      }
+		    }
+		    if (shouldSwitch) {
+		      /*If a switch has been marked, make the switch
+		      and mark that a switch has been done:*/
+		      rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+		      switching = true;
+		      //Each time a switch is done, increase this count by 1:
+		      switchcount ++;      
+		    } else {
+		      /*If no switching has been done AND the direction is "asc",
+		      set the direction to "desc" and run the while loop again.*/
+		      if (switchcount == 0 && dir == "asc") {
+		        dir = "desc";
+		        switching = true;
+		      }
+		    }
+		  }
+		
+		
+		
+		
+		
+		
+		
+		
+	}
+	
+
+
+
+</script>
+
+
+</html>
